@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { FiSearch, FiUser, FiHeart, FiShoppingCart } from 'react-icons/fi'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
@@ -107,6 +107,12 @@ function Footer(){
 }
 
 export default function App(){
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
   return (
     <div>
       <Header />
