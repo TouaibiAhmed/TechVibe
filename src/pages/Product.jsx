@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { PRODUCTS } from '../data/products'
 import PageHero from '../components/PageHero'
 import { addToCart, formatTnd } from '../utils/cart'
+import { FiPackage } from 'react-icons/fi'
 
 const highlights = [
   'Premium materials and durable finish',
@@ -21,6 +22,32 @@ export default function Product(){
   const p = PRODUCTS.find(x=>x.id===id) || PRODUCTS[0];
   const featuredColors = p.colors.slice(0, 4)
   const specificationEntries = Object.entries(p.specs || {})
+  const hasBulk = p.bulkPrice && p.minBulkQty
+
+  const [isBulk, setIsBulk] = useState(false)
+  const [qty, setQty] = useState(1)
+
+  const activePrice = isBulk ? p.bulkPrice : p.price
+  const savingsPercent = hasBulk ? Math.round((1 - p.bulkPrice / p.price) * 100) : 0
+
+  const handleModeChange = (bulk) => {
+    setIsBulk(bulk)
+    if (bulk && qty < p.minBulkQty) {
+      setQty(p.minBulkQty)
+    } else if (!bulk) {
+      setQty(1)
+    }
+  }
+
+  const handleQtyChange = (e) => {
+    const val = Math.max(isBulk ? p.minBulkQty : 1, Number(e.target.value) || 1)
+    setQty(val)
+  }
+
+  const handleAddToCart = () => {
+    addToCart(p, qty, isBulk)
+  }
+
   return (
     <div>
       <PageHero
@@ -49,16 +76,63 @@ export default function Product(){
           <aside className="product-summary-panel">
             <div className="panel-card product-summary-card">
               <div className="product-summary-top">
-                <p className="product-category-label">{p.category}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <p className="product-category-label">{p.category}</p>
+                  {hasBulk && <span className="badge-wholesale badge-wholesale-sm">Par Gros</span>}
+                </div>
                 <h1>{p.name}</h1>
                 <div className="product-summary-rating">★ {p.rating.toFixed(1)} rating</div>
               </div>
 
-              <div className="product-summary-price">{formatTnd(p.price)}</div>
+              <div className="product-summary-price">
+                {formatTnd(activePrice)}
+                {isBulk && (
+                  <span className="price-original" style={{ marginLeft: '10px' }}>
+                    {formatTnd(p.price)}
+                  </span>
+                )}
+              </div>
 
               <p className="product-summary-text">
                 A refined accessory built for everyday performance, with a clean finish and dependable quality.
               </p>
+
+              {/* Wholesale info banner */}
+              {hasBulk && (
+                <div className="wholesale-info-banner">
+                  <div className="wholesale-icon"><FiPackage size={16} /></div>
+                  <div className="wholesale-details">
+                    <strong>Wholesale available — Save {savingsPercent}%</strong>
+                    <span>Order {p.minBulkQty}+ units at {formatTnd(p.bulkPrice)} per unit</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Purchase mode selector */}
+              {hasBulk && (
+                <div className="product-option-block">
+                  <span>Purchase mode</span>
+                  <div className="purchase-mode-selector">
+                    <div
+                      className={`purchase-option-card ${!isBulk ? 'active' : ''}`}
+                      onClick={() => handleModeChange(false)}
+                    >
+                      <div className="option-label">Standard</div>
+                      <div className="option-price">{formatTnd(p.price)}</div>
+                      <div className="option-detail">Buy single units at retail price</div>
+                    </div>
+                    <div
+                      className={`purchase-option-card ${isBulk ? 'active' : ''}`}
+                      onClick={() => handleModeChange(true)}
+                    >
+                      <div className="option-label">Par Gros</div>
+                      <div className="option-price">{formatTnd(p.bulkPrice)}</div>
+                      <div className="option-detail">Min. {p.minBulkQty} units</div>
+                      <div className="option-savings">-{savingsPercent}% per unit</div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="product-option-block">
                 <span>Available colors</span>
@@ -75,8 +149,27 @@ export default function Product(){
                 </div>
               </div>
 
+              {/* Quantity input */}
+              <div className="product-option-block">
+                <span>Quantity</span>
+                <div className="qty-input-row">
+                  <input
+                    type="number"
+                    className="qty-input"
+                    min={isBulk ? p.minBulkQty : 1}
+                    value={qty}
+                    onChange={handleQtyChange}
+                  />
+                  {isBulk && (
+                    <label style={{ color: '#047857' }}>Min. {p.minBulkQty} units</label>
+                  )}
+                </div>
+              </div>
+
               <div className="product-actions">
-                <button className="btn btn-primary" onClick={() => addToCart(p)}>Add to Cart</button>
+                <button className="btn btn-primary" onClick={handleAddToCart}>
+                  Add {qty} to Cart — {formatTnd(activePrice * qty)}
+                </button>
                 <button className="btn btn-ghost">Buy Now</button>
               </div>
 
@@ -84,6 +177,9 @@ export default function Product(){
                 <div className="product-summary-item"><strong>Category</strong><span>{p.category}</span></div>
                 <div className="product-summary-item"><strong>Rating</strong><span>{p.rating.toFixed(1)} / 5</span></div>
                 <div className="product-summary-item"><strong>Colors</strong><span>{p.colors.length} options</span></div>
+                {hasBulk && (
+                  <div className="product-summary-item"><strong>Min. bulk order</strong><span>{p.minBulkQty} units</span></div>
+                )}
               </div>
             </div>
           </aside>

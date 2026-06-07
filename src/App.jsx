@@ -32,7 +32,10 @@ function Header(){
   useEffect(() => {
     const updateCartCount = () => {
       const cart = getCart()
-      const count = Object.values(cart).reduce((sum, qty) => sum + qty, 0)
+      const count = Object.values(cart).reduce((sum, entry) => {
+        if (typeof entry === 'number') return sum + entry
+        return sum + (entry.qty || 0)
+      }, 0)
       setCartCount(count)
     }
 

@@ -5,8 +5,25 @@ import { formatTnd, getCart } from '../utils/cart'
 
 export default function Cart(){
   const cart = getCart()
-  const items = Object.keys(cart).map(id=>({product:PRODUCTS.find(p=>p.id===id),qty:cart[id]}))
-  const subtotal = items.reduce((s,i)=>s + i.product.price * i.qty,0)
+
+  const items = Object.keys(cart).map(key => {
+    const entry = cart[key]
+
+    // Support both old schema (number) and new schema (object)
+    if (typeof entry === 'number') {
+      const product = PRODUCTS.find(p => p.id === key)
+      return product ? { product, qty: entry, isBulk: false, key } : null
+    }
+
+    const product = PRODUCTS.find(p => p.id === entry.productId)
+    return product ? { product, qty: entry.qty, isBulk: entry.isBulk || false, key } : null
+  }).filter(Boolean)
+
+  const subtotal = items.reduce((sum, item) => {
+    const unitPrice = item.isBulk ? item.product.bulkPrice : item.product.price
+    return sum + unitPrice * item.qty
+  }, 0)
+
   return (
     <div>
       <PageHero
@@ -21,17 +38,36 @@ export default function Cart(){
         <div className="main-content">
           <div className="responsive-table-container">
             <table>
-              <thead><tr><th>Image</th><th>Product</th><th>Price</th><th>Qty</th><th>Subtotal</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Product</th>
+                  <th>Unit Price</th>
+                  <th>Qty</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
               <tbody>
-                {items.map(i=> (
-                  <tr key={i.product.id}>
-                    <td><img src={i.product.images[0]} alt={i.product.name} className="cart-product-image" /></td>
-                    <td>{i.product.name}</td>
-                    <td>{formatTnd(i.product.price)}</td>
-                    <td>{i.qty}</td>
-                    <td>{formatTnd(i.product.price*i.qty)}</td>
-                  </tr>
-                ))}
+                {items.map(item => {
+                  const unitPrice = item.isBulk ? item.product.bulkPrice : item.product.price
+                  return (
+                    <tr key={item.key}>
+                      <td><img src={item.product.images[0]} alt={item.product.name} className="cart-product-image" /></td>
+                      <td>
+                        {item.product.name}
+                        {item.isBulk && <span className="cart-bulk-label">Par Gros</span>}
+                      </td>
+                      <td>
+                        {formatTnd(unitPrice)}
+                        {item.isBulk && (
+                          <div className="price-original" style={{ fontSize: '11px' }}>{formatTnd(item.product.price)}</div>
+                        )}
+                      </td>
+                      <td>{item.qty}</td>
+                      <td>{formatTnd(unitPrice * item.qty)}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

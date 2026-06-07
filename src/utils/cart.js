@@ -16,13 +16,34 @@ export function getCart() {
   }
 }
 
-export function addToCart(product, quantity = 1) {
+export function addToCart(product, quantity = 1, isBulk = false) {
   if (typeof window === 'undefined') {
     return
   }
 
   const cart = getCart()
-  cart[product.id] = (cart[product.id] || 0) + quantity
+  const key = isBulk ? `${product.id}-bulk` : product.id
+
+  if (cart[key]) {
+    // If the existing entry is old schema (just quantity number), migrate it
+    if (typeof cart[key] !== 'object') {
+      cart[key] = {
+        productId: product.id,
+        qty: cart[key] + quantity,
+        isBulk: isBulk
+      }
+    } else {
+      cart[key].qty += quantity
+    }
+  } else {
+    cart[key] = {
+      productId: product.id,
+      qty: quantity,
+      isBulk: isBulk
+    }
+  }
+
   window.localStorage.setItem('ecomus_cart', JSON.stringify(cart))
   window.dispatchEvent(new CustomEvent('cart-updated'))
 }
+
