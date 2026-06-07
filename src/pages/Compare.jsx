@@ -17,7 +17,7 @@ export default function Compare(){
         <table style={{width:'100%'}}>
           <thead><tr><th>Feature</th><th>Product A</th><th>Product B</th></tr></thead>
           <tbody>
-            <tr><td>Price</td><td>$19.95</td><td>$99.00</td></tr>
+            <tr><td>Price</td><td>$6.95</td><td>$14.00</td></tr>
           </tbody>
         </table>
       </div>

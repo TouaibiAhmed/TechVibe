@@ -23,8 +23,8 @@ export const PRODUCTS = [
   createProduct({
     id: 'airpods',
     name: 'AirPods Pro',
-    price: 89.0,
-    bulkPrice: 62.0,
+    price: 18.0,
+    bulkPrice: 10.0,
     minBulkQty: 10,
     category: 'Audio',
     colors: ['#f3f4f6', '#111827', '#d1d5db'],
@@ -34,7 +34,7 @@ export const PRODUCTS = [
   createProduct({
     id: 'blue-airpods',
     name: 'Blue AirPods',
-    price: 79.0,
+    price: 30.0,
     bulkPrice: 55.0,
     minBulkQty: 10,
     category: 'Audio',
@@ -67,9 +67,9 @@ export const PRODUCTS = [
   createProduct({
     id: 'charger-2',
     name: 'Compact Charger',
-    price: 26.0,
+    price: 21.0,
     bulkPrice: 16.0,
-    minBulkQty: 25,
+    minBulkQty: 10,
     category: 'Chargers',
     colors: ['#0f172a', '#f8fafc', '#94a3b8'],
     rating: 4.5,
@@ -78,7 +78,7 @@ export const PRODUCTS = [
   createProduct({
     id: 'headphones',
     name: 'Wireless Headphones',
-    price: 119.0,
+    price: 18.0,
     bulkPrice: 85.0,
     minBulkQty: 10,
     category: 'Audio',
@@ -100,8 +100,8 @@ export const PRODUCTS = [
   createProduct({
     id: 'jbl-headphones',
     name: 'JBL Wireless Headphones',
-    price: 149.0,
-    bulkPrice: 105.0,
+    price: 89.0,
+    bulkPrice: 65.0,
     minBulkQty: 5,
     category: 'Audio',
     colors: ['#111827', '#d1d5db', '#f97316'],

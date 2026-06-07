@@ -14,7 +14,7 @@ const FEATURED_PRODUCTS = [
   {
     id: 'smart-watch',
     name: 'Smart Watch Series',
-    price: 30.0,
+    price: 14.0,
     image: '/products/smart%20watch.jpg',
   },
   {

@@ -47,3 +47,17 @@ export function addToCart(product, quantity = 1, isBulk = false) {
   window.dispatchEvent(new CustomEvent('cart-updated'))
 }
 
+export function removeFromCart(cartKey) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const cart = getCart()
+  if (!(cartKey in cart)) {
+    return
+  }
+
+  delete cart[cartKey]
+  window.localStorage.setItem('ecomus_cart', JSON.stringify(cart))
+  window.dispatchEvent(new CustomEvent('cart-updated'))
+}
